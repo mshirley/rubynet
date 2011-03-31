@@ -1,0 +1,10 @@
+very simple phone home/pull payload model.
+
+--) client connects to server, 
+--) client sends server it's node key, 
+--) server checks inventory.dat for valid node keys
+--) server sends payload to client for execution
+ 
+run ./master.rb
+
+run ./slave.rb in another window
