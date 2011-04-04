@@ -2,7 +2,7 @@
 require 'socket'
 
 inventory = []
-
+if not defined?(Ocra)
 if File.exist?("inventory.dat")
 	puts "inventory found, loading..."
 	inventorydat = File.open("inventory.dat", "r")
@@ -31,15 +31,28 @@ server = TCPServer.new(2008)
 
 while (session = server.accept)
  Thread.start do
-	puts "connection from #{session.peeraddr[2]} at #{session.peeraddr[3]}"
+	time = Time.new
+	puts time.strftime("%Y-%m-%d %H:%M:%S") + "-- connection from #{session.peeraddr[3]} opened"
    	nodekey = session.gets
 	nodekey = nodekey.chomp
    	puts "nodekey #{nodekey}"
 	if inventory.include?(nodekey)
+		session.puts "Welcome: #{nodekey}"
+		request = session.gets
+		request = request.chomp
 		session.puts "PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD"
-		session.close
+		response = session.gets
+		response = response.chomp
+		if response == "ok"
+			puts "OK Recieved - Payload pushed to #{nodekey}"
+		else
+			puts "OK NOT RECIEVED - PROBLEM with #{nodekey}"
+			session.close
+		end
+		puts "connection from #{session.peeraddr[3]} closed"
 	else
 		session.close
 	end   
- end
+  end
+end
 end
