@@ -41,14 +41,19 @@ while (session = server.accept)
 		request = session.gets
 		request = request.chomp
 		session.puts "PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD-PAYLOAD"
-		response = session.gets
-		response = response.chomp
-		if response == "ok"
-			puts "OK Recieved - Payload pushed to #{nodekey}"
-		else
-			puts "OK NOT RECIEVED - PROBLEM with #{nodekey}"
-			session.close
+#		response = session.gets
+#		response = response.chomp
+#		if response == "ok"
+#			puts "OK Recieved - Payload pushed to #{nodekey}"
+#		else
+#			puts "OK NOT RECIEVED - PROBLEM with #{nodekey}"
+#			session.close
+#		end
+		hostdata = []
+		while dataline = session.gets
+			hostdata << dataline
 		end
+		File.open("nodedata.dat", "a") { |f| f.write(hostdata) }
 		puts "connection from #{session.peeraddr[3]} closed"
 	else
 		session.close

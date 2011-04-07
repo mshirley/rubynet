@@ -7,20 +7,22 @@ require 'sys/cpu'
 require 'sys/filesystem'
 require 'sys/proctable'
 require 'sys/uname'
+require 'sys/admin'
 include Sys
 
 if not defined?(Ocra)
+data = []
 
-puts "-- System Info Start --"
-puts "-- Network Info Start --"
-puts "Hostname: #{Host.hostname}"
-puts Host.ip_addr
+data << "-- System Info Start --"
+data << "-- Network Info Start --"
+data << "Hostname: #{Host.hostname}"
+data << Host.ip_addr 
 Host.info{ |h|
-        puts h
+	data << h
 }
-puts "-- Network Info Stop --"
+data << "-- Network Info Stop --"
 
-puts "-- OS Info Start --"
+data << "-- OS Info Start --"
 os = Uname.uname
 oslist = []
 for i in 0...os.length
@@ -28,52 +30,78 @@ for i in 0...os.length
         oslist << os[i]
 end
 for i in 0...oslist.length
-	puts oslist[i]
+	data << oslist[i]
 end
-puts "-- OS Info Stop --"
-puts "-- CPU Info Start --"
+data << "-- OS Info Stop --"
+
+
+data << "-- User Info Start --"
+if RUBY_PLATFORM.match("linux")
+	data << "Logged In User: " + Admin.get_login
+	data << "Current Users:"
+	Admin.users do |usr|
+		data << usr.name
+	end
+else
+	begin
+		data << "Logged In User: " + Admin.get_login
+		data << "Current Users:"
+		Admin.users do |usr|
+			data << usr.caption
+		end
+	rescue WIN32OLERuntimeError
+	end
+end
+data << "-- User Info Stop --"
+
+
+data << "-- CPU Info Start --"
 CPU.processors{ |cs|
 	cs.members.each{ |m|
-		puts "#{m}: " + cs[m].to_s
+		data << "#{m}: " + cs[m].to_s
 	}
 }
-puts "-- CPU Info Stop --"
+data << "-- CPU Info Stop --"
 
-
-puts "-- Filesystem Start --"
+data << "-- Filesystem Start --"
 Filesystem.mounts{ |mount|
-puts "-- Mount Info Start for #{mount.mount_point} --"
-puts "Type: #{mount.mount_type}"
-puts "MTime: #{mount.mount_time}"
-puts "MPoint: #{mount.mount_point}"
-puts "MName: #{mount.name}"
+data << "-- Mount Info Start for #{mount.mount_point} --"
+data << "Type: #{mount.mount_type}"
+data << "MTime: #{mount.mount_time}"
+data << "MPoint: #{mount.mount_point}"
+data << "MName: #{mount.name}"
 stat = Filesystem.stat(mount.mount_point)
-puts "Base Type: #{stat.base_type}"
-puts "Flags: #{stat.flags}"
-puts "Files Avail: #{stat.files_available}"
-puts "Block Size: #{stat.block_size}"
-puts "Blocks Avail: #{stat.blocks_available}"
-puts "Blocks: #{stat.blocks}"
-puts "Max Names: #{stat.name_max}"
-puts "Path: #{stat.path}"
-puts "FS ID: #{stat.filesystem_id}"
-puts "Files: #{stat.files}"
-puts "Frag Size: #{stat.fragment_size}"
-puts "Files Free: #{stat.files_free}"
-puts "Blocks Free: #{stat.blocks_free}"
-puts "-- Mount Info Stop for #{mount.mount_point} --"
+data << "Base Type: #{stat.base_type}"
+data << "Flags: #{stat.flags}"
+data << "Files Avail: #{stat.files_available}"
+data << "Block Size: #{stat.block_size}"
+data << "Blocks Avail: #{stat.blocks_available}"
+data << "Blocks: #{stat.blocks}"
+data << "Max Names: #{stat.name_max}"
+data << "Path: #{stat.path}"
+data << "FS ID: #{stat.filesystem_id}"
+data << "Files: #{stat.files}"
+data << "Frag Size: #{stat.fragment_size}"
+data << "Files Free: #{stat.files_free}"
+data << "Blocks Free: #{stat.blocks_free}"
+data << "-- Mount Info Stop for #{mount.mount_point} --"
 }
-puts "-- Filesystem Stop --"
+data << "-- Filesystem Stop --"
 
-puts "-- Process Info Start --"
-puts "-"
+
+data << "-- Process Info Start --"
+data << "-"
 ProcTable.ps{ |p|
-	puts "Name: #{p.comm}"
-	puts "PID: #{p.pid.to_s}"
-	puts "-"
+	data << "Name: #{p.comm}"
+	data << "PID: #{p.pid.to_s}"
+	data << "-"
 }
-puts "-- Process Info Stop --"
-puts "-- System Info Stop --"
+data << "-- Process Info Stop --"
+data << "-- System Info Stop --"
+
+puts "---- HOST DATA ----"
+puts data
+data = data.join(",")
 
 clientSession = TCPSocket.new( "localhost", 2008 )
 puts "starting connection"
@@ -86,8 +114,7 @@ while !(clientSession.closed?) && (serverMessage = clientSession.gets)
 	clientSession.puts "payload"
 	payload = clientSession.gets
 	puts "Payload recieved: #{payload}"
-	clientSession.puts "ok"
-
+	clientSession.puts data 
 	clientSession.close
 end 
 end
