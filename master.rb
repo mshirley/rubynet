@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 require 'socket'
-
+require 'zlib'
+require 'base64'
 inventory = []
 if not defined?(Ocra)
 if File.exist?("inventory.dat")
@@ -49,11 +50,16 @@ while (session = server.accept)
 #			puts "OK NOT RECIEVED - PROBLEM with #{nodekey}"
 #			session.close
 #		end
+		
+
 		hostdata = []
 		while dataline = session.gets
 			hostdata << dataline
 		end
-		File.open("nodedata.dat", "a") { |f| f.write(hostdata) }
+		puts hostdata
+		decompString = Zlib::Inflate.inflate hostdata.to_s 
+		puts decompString	
+		File.open("nodedata.dat", "a") { |f| f.write(decompString) }
 		puts "connection from #{session.peeraddr[3]} closed"
 	else
 		session.close
