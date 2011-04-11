@@ -111,6 +111,7 @@ class Echo < EM::Connection
 end
 
 EM.run do
-        EM.connect("0.0.0.0", 10000, Echo)
+	puts "Attempting to connect"
+        EM.connect("127.0.0.1", 10000, Echo)
 end
 end # ocra end

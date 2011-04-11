@@ -117,8 +117,8 @@ end
 
 
 EM.run do
-        EM.start_server("0.0.0.0", 10000, Main)
-	EM.start_server("0.0.0.0", 10001, CC)
+        EM.start_server("127.0.0.1", 10000, Main)
+	EM.start_server("127.0.0.1", 10001, CC)
 end
 end # ocra end
 
