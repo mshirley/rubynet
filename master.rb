@@ -60,35 +60,12 @@ def add_session(nodeip, node)
 	
 end
 
-def test
-	puts "this is a test"
-	return "yea this is interesting"
-
-end
-
 puts "### ---- ### Loading Complete ### ---- ###"
 
 puts "### ---- ### Starting Service ### ---- ###"
 set :port, 4563
-#use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
-enable :sessions
-
-get '/node-list/:masterkey' do
-# put an array of all registered hosts
-end
-
-get '/node-register/:id/:master' do
-	if params[:master] == $masterkey.chomp 
-		register(params[:id])
-	else
-		"incorrect master key"
-	end
-end
-
-get '/download/:filename' do |filename| # use |filename, id| with /download/:filename/:id
-	file = File.join('./files/', filename)
-	send_file(file, :disposition => 'attachment', :filename => File.basename(file))
-end
+use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
+#enable :sessions
 
 post '/upload/:filename/:id' do
 	if inventory_check(params[:id]) == "valid"
@@ -103,23 +80,40 @@ post '/upload/:filename/:id' do
 	end
 end
 
-#get '/node-auth/:node/:key' do
-#	inventory_check(params[:node])
-#	nodeip = @env['REMOTE_ADDR']
-#	if params[:key] == $masterkey.chomp
-#		session[:authed] = "yes"
-#		# no real reason for session control yet
-#		#add_session(nodeip, params[:node])
-#	else
-#	end
-#end
-
-get '/node-checkup/:id'	do
-	
-end
-
-put '/node/:id' do
-	"the id is #{params[:id]}"
+get '/node/:id/:command/:optional1/:optional2' do
+	case params[:command]
+	when "auth"
+		inventory_check(params[:id])
+		nodeip = @env['REMOTE_ADDR']
+		if params[:optional1] == $masterkey.chomp
+			response.set_cookie('auth', :value => "yes")
+			"you are authenticated\n"
+			#add_session(nodeip, params[:node])
+		else
+		end
+	when "gdownload"
+		file = File.join('./files/', params[:optional1])
+		send_file(file, :disposition => 'attachment', :filename => File.basename(file))
+	when "mdownload"
+		"master download\n"
+	when "register"
+		if session[:authed] == "yes"
+			if params[:optional1] == $masterkey.chomp
+				register(params[:id])
+			else
+				"incorrect master key"
+			end
+		else
+			"you are not authenticated"
+		end
+	when "list"
+		"list\n"
+	when "clear"
+		session[:authed] = "no"
+		"session cleared\n"
+	else 
+		"invalid command\n"
+	end
 end
 
 delete '/nodes/:id' do
