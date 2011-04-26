@@ -36,6 +36,7 @@ end
 
 load_inv()
 
+# node registration function
 def register(id)
 	
 	if inventory_check(id) == "valid"
@@ -47,6 +48,7 @@ def register(id)
 
 end
 
+# this will check the global inventory array for a node id
 def inventory_check(id)
 	if $inventory.include?(id)
 		return "valid"
@@ -55,9 +57,21 @@ def inventory_check(id)
 	end
 end
 
+# nothing here yet
 def add_session(nodeip, node)
 		
 	
+end
+
+# reads a .job file for a specific node
+def get_jobs(id)
+	output = []
+	if File.exist?("./files/jobs/#{id}.job")
+		jobs = IO.readlines("./files/jobs/#{id}.job")
+		"#{jobs}"
+	else
+		"no #{id}.job"
+	end
 end
 
 puts "### ---- ### Loading Complete ### ---- ###"
@@ -67,21 +81,29 @@ set :port, 4563
 use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 #enable :sessions
 
-post '/upload/:filename/:id' do
-	if inventory_check(params[:id]) == "valid"
-		filename = File.join("./files/", params[:filename])
-		datafile = params[:data]
-		File.open(filename, 'wb') do |file|
-			file.write(datafile[:tempfile].read)
+# this defines the file upload post handler
+post '/upload/:area/:id/:filename' do
+	# the jobs and data directory must exist under ./files/
+	if params[:area] == "jobs" || params[:area] == "data"
+		if inventory_check(params[:id]) == "valid"
+			filename = File.join("./files/", params[:area], "/", params[:id] + "-" + Time.now.strftime("%m-%d-%y-%Hh%Mm%Ss-") + params[:filename])
+			datafile = params[:data]
+			File.open(filename, 'wb') do |file|
+				file.write(datafile[:tempfile].read)
+			end
+			"wrote to #{filename}\n"
+		else
+			"invalid id -- id used: #{params[:id]}"
 		end
-		"wrote to #{filename}\n"
 	else
-		"invalid id"
+		"incorrect area"
 	end
 end
 
+# main request function with specific commands and arguments
 get '/node/:id/:command/:optional1/:optional2' do
 	case params[:command]
+	# Still not working, sessions aren't sticking
 	when "auth"
 		inventory_check(params[:id])
 		nodeip = @env['REMOTE_ADDR']
@@ -111,6 +133,8 @@ get '/node/:id/:command/:optional1/:optional2' do
 	when "clear"
 		session[:authed] = "no"
 		"session cleared\n"
+	when "getjob"
+		get_jobs(params[:id])	
 	else 
 		"invalid command\n"
 	end
