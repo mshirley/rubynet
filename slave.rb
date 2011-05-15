@@ -1,23 +1,33 @@
 require 'net/http'
 
 def load_db()
-if File.exists?("node.dat")
+key = ""
+masterkey = ""
+configs = ["node.dat", "masters.dat"]
+
+configs.each { |i|
+puts i
+if File.exists?(i) && i == "node.dat"
 	puts "Node configuration found, loading..."
-	nodedata = File.open("node.dat","r")
+	nodedata = File.open(i,"r")
 	puts "Node configuration loaded"
 	nodedata.each do |line|
-		$key = line.chomp
+		key = line.chomp
 	end
-	puts "Key is #{$key}"
-else
+	puts "Key is #{key}"
+else if !File.exist?(i) && i == "node.dat"
 	puts "Node configuration not found, creating..."
 	nodedata = File.new("node.dat", "w")
 	o = [('a'..'z'),('A'..'Z'),('0'..'9')].map{ |i| i.to_a }.flatten
-	$key = (0..50).map { o[rand(o.length)] }.join
-	nodedata.puts($key)
-	puts "Generating key... #{$key}"
+	key = (0..50).map { o[rand(o.length)] }.join
+	nodedata.puts(key)
+	puts "Generating key... #{key}"
 	nodedata.close
 end
+end
+}
+return key
+
 end
 
 def fetch(http, url)
@@ -26,16 +36,15 @@ def fetch(http, url)
 	return response
 end
 
-def auth(host, port, id, masterkey)
+def auth(http, key, masterkey)
 	puts "authenticating"
-	response = fetch("http://" + host + ":" + port + "/node/" + id + "/auth/" + masterkey + "/noop")
+	response = fetch(http, "/node/#{key}/register/#{masterkey}/noop")
 	return response
 end
 
-def register(host, port, id, masterkey)
-
+def register(http, key, masterkey)
 	puts "registering"
-	response = fetch("http://" + host + ":" + port + "/node/" + id + "/register/" + masterkey + "/noop")
+	response = fetch(http, "/node/#{key}/auth/#{masterkey}/optional2")
 	return response
 end
 
@@ -45,16 +54,26 @@ nodeid = "0987654321"
 masterkey = "1234567890"
 cookie = ""
 
-load_db()
+key = load_db()
+def init(host, port, key, masterkey)
+	begin
+		http = Net::HTTP.new(host, port)
+		response = auth(http, key, masterkey)
+		response = register(http, key, masterkey)
+	rescue Errno::ECONNREFUSED
+		puts "server actively refusing"
+	rescue Timeout::Error
+		puts "timeout"
+	end
+return response
+end
 
-http = Net::HTTP.new(host, port)
-while 1 == 1
-resp = fetch(http, "/node/#{$key}/register/1234567890/noop")
+init(host, port, key, masterkey)
 #puts resp.response['set-cookie'].split('; ')[0]
-resp = fetch(http, "/node/#{$key}/auth/1234567890/optional2")
 #puts resp.response['set-cookie'].split('; ')[0]
 #puts cookie
-sleep rand(15) 
+#while 1 == 1
+#	sleep rand(15) 
 #puts auth(host, port, nodeid, masterkey)
 #puts register(host, port, nodeid, masterkey)
-end
+#end
