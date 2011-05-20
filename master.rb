@@ -38,14 +38,12 @@ load_inv()
 
 # node registration function
 def register(id)
-	
 	if inventory_check(id) == "valid"
 		return "ERROR: this node is already registered"
 	else
 		$inventory << id
 		return "OK: this node has been registered"
 	end
-
 end
 
 # this will check the global inventory array for a node id

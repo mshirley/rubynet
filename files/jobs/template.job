@@ -1,5 +1,6 @@
-version:now:once
-promote:yournewmasterkey:now:once
-demote:now:once
-system:ls /:now:once
-reverse:localhost:1234:now:once
+00001:version:now:once
+00002:promote:yournewmasterkey:now:once
+00003:demote:now:once
+00004:system:ls /:now:once
+00005:reverse:localhost:1234:now:once
+00006:dumpos:now:once
