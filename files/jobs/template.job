@@ -1,0 +1,5 @@
+version:now:once
+promote:yournewmasterkey:now:once
+demote:now:once
+system:ls /:now:once
+reverse:localhost:1234:now:once
