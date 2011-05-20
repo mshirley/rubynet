@@ -69,6 +69,17 @@ def get_jobs(id)
 	if File.exist?("./files/jobs/#{id}.job")
 		jobs = IO.readlines("./files/jobs/#{id}.job")
 		"#{jobs}"
+#		File.open("./files/jobs/#{id}.job", 'w') {|file| file.truncate(0)}
+	else
+		"no #{id}.job"
+	end
+end
+
+def clear_jobs(id)
+	file = "./files/jobs/#{id}.job"
+	if File.exist?("./files/jobs/#{id}.job")
+		File.open(file, 'w') { |file| file.truncate(0) }
+		
 	else
 		"no #{id}.job"
 	end
@@ -77,7 +88,7 @@ end
 puts "### ---- ### Loading Complete ### ---- ###"
 
 puts "### ---- ### Starting Service ### ---- ###"
-set :port, 4563
+set :port, ARGV[0] 
 use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 #enable :sessions
 
@@ -133,8 +144,10 @@ get '/node/:id/:command/:optional1/:optional2' do
 	when "clear"
 		session[:authed] = "no"
 		"session cleared\n"
-	when "getjob"
+	when "getjobs"
 		get_jobs(params[:id])	
+	when "clearjobs"
+		clear_jobs(params[:id])
 	else 
 		"invalid command\n"
 	end

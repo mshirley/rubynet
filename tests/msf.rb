@@ -4,14 +4,14 @@ $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__),"..", "..",
 
 require 'msf/base'
 
-ARGV = ["exploit/multi/handler"]
+asdf = ["exploit/multi/handler"]
  
 framework = Msf::Simple::Framework.create
  
 begin
 
 # Create the module instance.
-mod = framework.modules.create(ARGV.shift)
+mod = framework.modules.create(asdf.shift)
  
      # Dump the module’s information in readable text format.
      puts Msf::Serializer::ReadableText.dump_module(mod)

