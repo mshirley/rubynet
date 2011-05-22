@@ -94,16 +94,19 @@ use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 post '/upload/:area/:id/:filename' do
 	# the jobs and data directory must exist under ./files/
 	if params[:area] == "jobs" || params[:area] == "data"
-		if inventory_check(params[:id]) == "valid"
+	#	if inventory_check(params[:id]) == "valid"
 			filename = File.join("./files/", params[:area], "/", params[:id] + "-" + Time.now.strftime("%m-%d-%y-%Hh%Mm%Ss-") + params[:filename])
-			datafile = params[:data]
+			puts "Filename is : #{filename}"
+			datafile = request.env["rack.input"].read #params[:data]
+			puts "Datafile class is : #{datafile.class}"
 			File.open(filename, 'wb') do |file|
-				file.write(datafile[:tempfile].read)
+				puts datafile
+				file.write(datafile)
 			end
 			"wrote to #{filename}\n"
-		else
-			"invalid id -- id used: #{params[:id]}"
-		end
+	#	else
+	#		"invalid id -- id used: #{params[:id]}"
+	#	end
 	else
 		"incorrect area"
 	end

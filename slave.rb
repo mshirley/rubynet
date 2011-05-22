@@ -6,13 +6,13 @@ require 'open4'
 require 'rufus/scheduler'
 require 'lib/load_sdata'
 require 'lib/sjobs'
-require 'lib/sremote_request'
+require 'lib/sremote_requests'
 
-scheduler = Rufus::Scheduler.start_new
 
 key, masterslist = load_db()
 puts "masters in the list:"
 puts masterslist
+
 
 while 1 == 1
 
@@ -20,15 +20,19 @@ jobthreads = []
 threads = []
 jobqueue = []
 
-scheduler.in '5s', :blocking => true do
-	masterslist.each { |master|
+masterslist.each { |master|
 	jobqueue << pull_jobs(master, key)
-	}
-end
+}
 
-sleep 10
-puts "Jobs:"
-puts jobqueue
+sched_job(jobqueue, key)
+
+puts "Waiting a bit" 
+sleep rand(30) 
+
+puts "uploading"
+
+
+
 end
 
 
