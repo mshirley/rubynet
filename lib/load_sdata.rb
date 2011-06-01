@@ -5,6 +5,19 @@ def load_db()
         configs = ["node.dat", "masters.dat"]
 
         configs.each { |i|
+        if File.exists?(i) && i == "masters.dat"
+                puts "Masters list found, loading..."
+                masterslist = File.open(i, "r")
+                puts "Masters list loaded"
+                masterslist.each do |line|
+                        mlist <<= line.chomp
+                end
+        else if !File.exist?(i) && i == "masters.dat"
+                puts "Masters list not found, creating..."
+                masterslist = File.new("masters.dat", "w")
+                masterslist.puts("localhost:4563:1234567890")
+                end
+        end
         puts i
         if File.exists?(i) && i == "node.dat"
                 puts "Node configuration found, loading..."
@@ -22,19 +35,6 @@ def load_db()
                 nodedata.puts(key)
                 puts "Generating key... #{key}"
                 nodedata.close
-                end
-        end
-        if File.exists?(i) && i == "masters.dat"
-                puts "Masters list found, loading..."
-                masterslist = File.open(i, "r")
-                puts "Masters list loaded"
-                masterslist.each do |line|
-                        mlist <<= line.chomp
-                end
-        else if !File.exist?(i) && i == "masters.dat"
-                puts "Masters list not found, creating..."
-                masterslist = File.new("masters.dat", "w")
-                masterslist.puts("localhost:4563:1234567890")
                 end
         end
         }
