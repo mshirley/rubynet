@@ -2,91 +2,24 @@
 
 require 'rubygems'
 require 'sinatra'
+require 'lib/mjobs'
+require 'lib/load_mdata'
+
 puts "### ---- ### Loading ### ---- ###"
 
 # Ocra is the ruby2exe app we're using.  this if loop prevents the compiler from executing it.
 if not defined?(Ocra)
 
-def load_inv()
-        $inventory = []
-        if File.exist?("inventory.dat")
-                puts "inventory found, loading..."
-                inventorydat = File.open("inventory.dat", "r")
-                puts "inventory loaded"
-                $masterkey = inventorydat.readline
-                puts "masterkey is #{$masterkey}"
-                puts "importing existing units"
-                inventorydat.each do |line|
-                        line = line.chomp
-                        $inventory << line
-                end
-                puts "units loaded"
-                puts $inventory
-                inventorydat.close
-        else
-                puts "no inventory found, creating new database"
-                inventorydat = File.new("inventory.dat", "w")
-                puts "populating db with master key and test units"
-                inventorydat.puts("1234567890")
-                inventorydat.puts("0987654321")
-                inventorydat.puts("5432167890")
-                inventorydat.close
-        end
-end
-
 load_inv()
-
-# node registration function
-def register(id)
-	if inventory_check(id) == "valid"
-		return "ERROR: this node is already registered"
-	else
-		$inventory << id
-		return "OK: this node has been registered"
-	end
-end
-
-# this will check the global inventory array for a node id
-def inventory_check(id)
-	if $inventory.include?(id)
-		return "valid"
-	else
-		return "invalid"
-	end
-end
-
-# nothing here yet
-def add_session(nodeip, node)
-		
-	
-end
-
-# reads a .job file for a specific node
-def get_jobs(id)
-	output = []
-	if File.exist?("./files/jobs/#{id}.job")
-		jobs = IO.readlines("./files/jobs/#{id}.job")
-		"#{jobs}"
-#		File.open("./files/jobs/#{id}.job", 'w') {|file| file.truncate(0)}
-	else
-		"no #{id}.job"
-	end
-end
-
-def clear_jobs(id)
-	file = "./files/jobs/#{id}.job"
-	if File.exist?("./files/jobs/#{id}.job")
-		File.open(file, 'w') { |file| file.truncate(0) }
-		
-	else
-		"no #{id}.job"
-	end
-end
 
 puts "### ---- ### Loading Complete ### ---- ###"
 
 puts "### ---- ### Starting Service ### ---- ###"
-set :port, ARGV[0] 
+if ARGV[0].nil?
+	set :port, 1234
+else
+	set :port, ARGV[0] 
+end
 use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 #enable :sessions
 
