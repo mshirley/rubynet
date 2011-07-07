@@ -4,22 +4,26 @@ require 'rubygems'
 require 'sinatra'
 require 'lib/mjobs'
 require 'lib/load_mdata'
-
-puts "### ---- ### Loading ### ---- ###"
+require 'socket'
 
 # Ocra is the ruby2exe app we're using.  this if loop prevents the compiler from executing it.
 if not defined?(Ocra)
 
+puts "### ---- ### Loading ### ---- ###"
 load_inv()
-
 puts "### ---- ### Loading Complete ### ---- ###"
 
 puts "### ---- ### Starting Service ### ---- ###"
 if ARGV[0].nil?
 	set :port, 1234
+	port = 1234
 else
 	set :port, ARGV[0] 
+	port = ARGV[0]
 end
+
+ip = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[2][3]
+
 use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 #enable :sessions
 
@@ -64,15 +68,15 @@ get '/node/:id/:command/:optional1/:optional2' do
 	when "mdownload"
 		"master download\n"
 	when "register"
-		if session[:authed] == "yes"
+	#	if session[:authed] == "yes"
 			if params[:optional1] == $masterkey.chomp
-				register(params[:id])
+				register(params[:id], ip, port)
 			else
 				"incorrect master key"
 			end
-		else
-			"you are not authenticated"
-		end
+	#	else
+	#		"you are not authenticated"
+	#	end
 	when "list"
 		"list\n"
 	when "clear"

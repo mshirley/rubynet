@@ -1,6 +1,0 @@
-00003:demote:now:once
-00006:dumpos:now:once
-00002:promote:yournewmasterkey:now:once
-00005:reverse:localhost:1234:now:once
-00004:system_info:now:once:192.168.116.165:1234
-00001:version:now:once

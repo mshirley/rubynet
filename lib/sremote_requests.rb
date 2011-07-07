@@ -60,6 +60,7 @@ def reverse(job)
 end
 
 def upload(host, port, key, data, filename)
+	puts "Uploading"
 	response = post(host, port, "/upload/data/#{key}/#{filename}", data)
 	return response
 end
