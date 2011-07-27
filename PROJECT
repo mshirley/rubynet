@@ -1,0 +1,32 @@
+[ -- core functions -- ]
+download files
+upload files
+execute stored data
+execute files
+tunneling
+command and control
+self deleting
+access controlled
+
+[ -- modules -- ]
+collect server information 
+	applications installed 
+	services running 
+	running processes 
+	os version 
+	hardware 
+	current network information and netstat
+extract stored user and password data
+	user accounts and hashes
+	vnc passwords
+	saved browser passwords
+	browser history
+start reverse shell/listener
+pass the hash
+keylogger
+anti-virus detection and evasion
+firewall/ids/ips evasion
+cpu idle detection
+dump memory/hibernation file
+search file system for sepcific keywords
+data analysis and reporting
