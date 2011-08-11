@@ -22,7 +22,8 @@ else
 	port = ARGV[0]
 end
 
-ip = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[2][3]
+#ip = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[2][3]
+ip = ENV['VMC_APP_HOST']
 
 use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 #enable :sessions
