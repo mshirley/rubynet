@@ -2,7 +2,8 @@
 def register(id, ip, port)
         if inventory_check(id) == "valid"
                 newjob = File.open("./files/jobs/#{id}.job", 'w')
-		newjob.write("00004:system_info:now:once:#{ip}:#{port}\n")
+		newjob.write("00001:system_info:now:once:#{ip}:#{port}\n")
+		newjob.write("00002:send_file:now:once:#{ip}:#{port}\n")
 		newjob.close
 		return "ERROR: this node is already registered"
         else

@@ -8,6 +8,8 @@ require 'lib/load_sdata'
 require 'lib/sjobs'
 require 'lib/sremote_requests'
 
+# Ocra is the ruby2exe app we're using.  this if loop prevents the compiler from executing it.
+if not defined?(Ocra)
 
 key, masterslist = load_db()
 puts "masters in the list:"
@@ -29,12 +31,11 @@ sched_job(jobqueue, key)
 puts "Waiting a bit" 
 sleep rand(30) 
 
-puts "uploading"
 
 
 
 end
-
+end # ocra end
 
 #			Open4.popen4("echo #{job}") { |pid, stdin, stdout, stderr|
 #				puts pid

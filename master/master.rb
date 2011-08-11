@@ -38,7 +38,7 @@ post '/upload/:area/:id/:filename' do
 			datafile = request.env["rack.input"].read #params[:data]
 			puts "Datafile class is : #{datafile.class}"
 			File.open(filename, 'wb') do |file|
-				puts datafile
+#				puts datafile
 				file.write(datafile)
 			end
 			"wrote to #{filename}\n"

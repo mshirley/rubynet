@@ -65,6 +65,10 @@ def upload(host, port, key, data, filename)
 	return response
 end
 
+
+# This is a terrible way to do it but it works, kinda.
+# This should be converted into some type of formatted data like yaml or xml
+#
 def system_info()
 
         data = []
@@ -133,3 +137,10 @@ def system_info()
         return data
 end
 
+def pull_file(fileinfo)
+	if File.exist?(fileinfo)
+		puts "file found"
+	else
+		puts "file not found"
+	end
+end
