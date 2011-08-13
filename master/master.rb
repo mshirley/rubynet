@@ -14,21 +14,28 @@ load_inv()
 puts "### ---- ### Loading Complete ### ---- ###"
 
 puts "### ---- ### Starting Service ### ---- ###"
-if ARGV[0].nil?
-	set :port, 1234
-	port = 1234
-else
-	set :port, ARGV[0] 
-	port = ARGV[0]
-end
+#if ARGV[0].nil?
+#	set :port, 1234
+#	port = 1234
+#else
+#	set :port, ARGV[0] 
+#	port = ARGV[0]
+#end
 
 #ip = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[2][3]
-ip = ENV['VMC_APP_HOST']
-
-use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
+#ip = ENV['VMC_APP_HOST']
+ip = "master.vcap.me"
+port = "80"
+#port = ENV['VMC_APP_PORT']
+#use Rack::Session::Pool, :domain => "rubynet.lol", :expire_after => 2592000
 #enable :sessions
 
 # this defines the file upload post handler
+get '/' do
+	"whoa"
+end
+
+
 post '/upload/:area/:id/:filename' do
 	# the jobs and data directory must exist under ./files/
 	if params[:area] == "jobs" || params[:area] == "data"
@@ -94,4 +101,9 @@ end
 
 delete '/nodes/:id' do
 end
+
+get '/asdf' do
+	"asdf"
+end
 end # ocra end
+

@@ -2,7 +2,7 @@
 
 require 'rubygems'
 require 'net/http'
-require 'open4'
+#require 'open4'
 require 'rufus/scheduler'
 require 'lib/load_sdata'
 require 'lib/sjobs'
